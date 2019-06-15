@@ -75,6 +75,20 @@ if __name__ == "__main__":
 
     #Seed the random number generator
     random.seed(1)
+    #   o
+    #o<   \
+    #   o
+    #o<   >  o - data 1
+    #   o
+    #o<   >  o - data 2
+    #   o
+    #o<   >  o - data 3
+    #   o
+    #o<   >  o - data 4
+    #   o
+    #o    /
+    #   o
+    
 
     # Create layer 1 (7 neurons, each with 6 inputs)
     layer1 = NeuronLayer(7, 6)
