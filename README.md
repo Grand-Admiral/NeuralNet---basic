@@ -7,5 +7,5 @@ Files:
 
 
 The math:
-pt1 - https://www.youtube.com/watch?v=aVId8KMsdUU
-pt2 - https://www.youtube.com/watch?v=zpykfC4VnpM
+<p>pt1 - https://www.youtube.com/watch?v=aVId8KMsdUU</p>
+<p>pt2 - https://www.youtube.com/watch?v=zpykfC4VnpM</p>
