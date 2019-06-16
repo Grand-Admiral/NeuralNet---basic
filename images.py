@@ -91,7 +91,7 @@ if __name__ == "__main__":
     
 
     # Create layer 1 (7 neurons, each with 6 inputs)
-    layer1 = NeuronLayer(7, 6)
+    layer1 = NeuronLayer(7, 3600)
 
     # Create layer 2 (4 single neuron with 7 inputs)
     layer2 = NeuronLayer(4, 7)
@@ -107,6 +107,46 @@ if __name__ == "__main__":
 
     # The training set. We have 7 examples, each consisting of 3 input values
     # and 1 output value.
+    from PIL import Image
+    im = Image.open("images/1.png")
+    im1 = np.asarray(im)
+
+    im = Image.open("images/2.png")
+    im2 = np.asarray(im)
+
+    im = Image.open("images/3.png")
+    im3 = np.asarray(im)
+
+    im = Image.open("images/4.png")
+    im4 = np.asarray(im)
+
+#append pixles
+    imgArray = []
+    img1 = []
+    img2 = []
+    img3 = []
+    img4 = []
+    for i in range(len(im1)):
+        for j in range(len(im1[i])):
+            img1.append(im1[i][j][0]);
+
+    for i in range(len(im2)):
+        for j in range(len(im2[i])):
+            img2.append(im2[i][j][0]);
+
+    for i in range(len(im3)):
+        for j in range(len(im3[i])):
+            img3.append(im3[i][j][0]);
+
+    for i in range(len(im4)):
+        for j in range(len(im4[i])):
+            img4.append(im4[i][j][0]);
+
+    print("appended", imgArray)
+    imgArray = array([img1,img2,img3,img4]) #list of images for training
+
+
+    
     training_set_inputs = array([[1, 0, 1, 0, 1, 0],
                                  [0, 1, 1, 0, 1, 1],
                                  [0, 0, 1, 0, 0, 1],
@@ -122,16 +162,22 @@ if __name__ == "__main__":
                                    [0 ,0, 1, 0, 0, 0, 1, 1],
                                    [0 ,0, 0, 1, 1, 1, 1, 1]]).T ####
 
+    #image rec outputs
+    training_set_outputs3 = array([[1,0,0,0],
+                                   [0,1,0,0],
+                                   [0,0,1,0],
+                                   [0,0,0,1]]).T #### 1 = blank, 2 = spiral, 3 = virtical line, 4 = parralel line
+
     print("Test Inputs: ")
-    print(training_set_inputs)
+    print(imgArray)
 
     print("Test Outputs: ")
-    print(training_set_outputs2)
+    print(training_set_outputs3)
 
 
     # Train the neural network using the training set.
     # Do it 60,000 times and make small adjustments each time.
-    neural_network.train(training_set_inputs, training_set_outputs2, 60000)
+    neural_network.train(imgArray, training_set_outputs3, 60000)
     
     print("Stage 2) New synaptic weights after training for single stage output: ")
     neural_network.print_weights()
@@ -139,19 +185,21 @@ if __name__ == "__main__":
 
     while True:
         # Test the neural network with a new situation.
-        inputdata = int(input("1: "))
-        inputdata1 = int(input("2: "))
-        inputdata2 = int(input("3: "))
-        inputdata3 = int(input("4: "))
-        inputdata4 = int(input("5: "))
-        inputdata5 = int(input("6: "))
+        #inputdata = int(input("1: "))
+        #inputdata1 = int(input("2: "))
+        #inputdata2 = int(input("3: "))
+        #inputdata3 = int(input("4: "))
+        #inputdata4 = int(input("5: "))
+        #inputdata5 = int(input("6: "))
+
+        #data for check
+        #data = array([inputdata, inputdata1, inputdata2, inputdata3, inputdata4, inputdata5])
         
-        data = array([inputdata, inputdata1, inputdata2, inputdata3, inputdata4, inputdata5])
-        
-        print("Stage 3) Considering a new situation", data, "-> ?: ")
-        hidden_state, output = neural_network.think(data)
+        print("Stage 3) Considering a new situation", 1, "-> ?: ")
+        hidden_state, output = neural_network.think(imgArray[1])
         print("original: ", output)
         print("Node 1: ", round(output.tolist()[0]), " Node 2: ", round(output.tolist()[1]),
               " Node 3: ", round(output.tolist()[2]), " Node 4: ", round(output.tolist()[3]))
 
         print(training_set_outputs2.tolist())
+        break

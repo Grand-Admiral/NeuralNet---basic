@@ -112,7 +112,8 @@ if __name__ == "__main__":
     training_set_outputs1 = array([[0 ,1, 1, 1, 1, 0, 0]]).T
 
     
-    training_set_outputs2 = array([[0 , 1, 1, 1, 1, 0, 0],[1 ,0, 0, 0, 0, 1, 1]]).T ####
+    training_set_outputs2 = array([[0 ,1, 1, 1, 1, 0, 0],
+                                   [1 ,0, 0, 0, 0, 1, 1]]).T ####
 
     print(training_set_outputs2)
 
