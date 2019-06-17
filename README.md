@@ -3,7 +3,7 @@ From a tutorial online with some adjustments and experiments.
 
 Files:
 - medium.py is the original code 
-- 1medium.py is the adjusted code with two outputs and bias
+- duelmedium.py is the adjusted code with two outputs and bias
 - images.py reads the values of a black&white image pixels and places them in the input values
 </br>
 Tutorial:</br>
