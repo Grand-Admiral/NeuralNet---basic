@@ -120,19 +120,13 @@ if __name__ == "__main__":
     im = Image.open("images/4.png")
     im4 = np.asarray(im)
 
-    im = Image.open("check.png")
-    imcheck = np.asarray(im)
-
 #append pixles
     imgArray = []
     img1 = []
     img2 = []
     img3 = []
     img4 = []
-    checkimg = []
-    for i in range(len(imcheck)):
-        for j in range(len(imcheck[i])):
-            checkimg.append(imcheck[i][j][0]);
+    
     
     for i in range(len(im1)):
         for j in range(len(im1[i])):
@@ -190,8 +184,19 @@ if __name__ == "__main__":
     print("Stage 2) New synaptic weights after training for single stage output: ")
     neural_network.print_weights()
 
-
+    check = "check"
     while True:
+        inputt = str(input())
+        if inputt != "":
+            check = inputt
+        im = Image.open(check+".png")
+        imcheck = np.asarray(im)
+        
+        checkimg = []
+        for i in range(len(imcheck)):
+            for j in range(len(imcheck[i])):
+                checkimg.append(imcheck[i][j][0]);
+                
         # Test the neural network with a new situation.
         #inputdata = int(input("1: "))
         #inputdata1 = int(input("2: "))
@@ -203,11 +208,10 @@ if __name__ == "__main__":
         #data for check
         #data = array([inputdata, inputdata1, inputdata2, inputdata3, inputdata4, inputdata5])
         
-        print("Stage 3) Considering a new situation", 1, "-> ?: ")
+        print("Stage 3) Considering a new situation", array(checkimg), "-> ?: ")
         hidden_state, output = neural_network.think(array(checkimg))
         print("original: ", output)
         print("Node 1: ", round(output.tolist()[0]), " Node 2: ", round(output.tolist()[1]),
               " Node 3: ", round(output.tolist()[2]), " Node 4: ", round(output.tolist()[3]))
 
         #print(training_set_outputs2.tolist())
-        break
