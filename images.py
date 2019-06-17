@@ -1,5 +1,7 @@
 from numpy import exp, array, random, dot
+from PIL import Image
 import numpy as np
+
 #https://medium.com/technology-invention-and-more/how-to-build-a-multi-layered-neural-network-in-python-53ec3d1d326a
 
 class NeuronLayer():
@@ -72,9 +74,6 @@ class NeuralNetwork():
         print("L2 bias", self.layer2.bias)
 
 if __name__ == "__main__":
-
-    #Seed the random number generator
-    random.seed(1)
     #   o
     #o<   \
     #   o
@@ -89,32 +88,9 @@ if __name__ == "__main__":
     #o    /
     #   o
     
-
-    # Create layer 1 (7 neurons, each with 6 inputs)
-    layer1 = NeuronLayer(7, 3600)
-
-    # Create layer 2 (4 single neuron with 7 inputs)
-    layer2 = NeuronLayer(4, 7)
-
-
-    # Combine the layers to create a neural network
-    neural_network = NeuralNetwork(layer1, layer2)
-
-
-
-    print("Stage 1) Random starting synaptic weights: ")
-    neural_network.print_weights()
-
-    # The training set. We have 7 examples, each consisting of 3 input values
-    # and 1 output value.
-
-
-
-    from PIL import Image
-    #append pixles
+    #append pixles for inputs
     imgArray = []
     for s in range(1,4+1):
-        print(s)
         im = Image.open("images/"+str(s)+".png")
         im1 = np.asarray(im)
         img1 = []
@@ -123,12 +99,28 @@ if __name__ == "__main__":
             for j in range(len(im1[i])):
                 img1.append(im1[i][j][0]);
         imgArray.append(img1)
-    imgArray = array(imgArray)
-    print("appended", imgArray)
-
-
-
     
+    imgArray = array(imgArray)
+    
+    #Seed the random number generator
+    random.seed(1)    
+
+    # Create layer 1 (7 neurons, each with 6 inputs)
+    layer1 = NeuronLayer(7, len(img1)) #all images must be the same pixel size
+
+    # Create layer 2 (4 single neuron with 7 inputs)
+    layer2 = NeuronLayer(4, 7)
+
+    # Combine the layers to create a neural network
+    neural_network = NeuralNetwork(layer1, layer2)
+
+
+    print("Stage 1) Random starting synaptic weights: ")
+    neural_network.print_weights()
+
+    # The training set. We have 7 examples, each consisting of 3 input values
+    # and 1 output value.
+
     training_set_inputs = array([[1, 0, 1, 0, 1, 0],
                                  [0, 1, 1, 0, 1, 1],
                                  [0, 0, 1, 0, 0, 1],
