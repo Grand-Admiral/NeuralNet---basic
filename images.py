@@ -107,45 +107,25 @@ if __name__ == "__main__":
 
     # The training set. We have 7 examples, each consisting of 3 input values
     # and 1 output value.
+
+
+
     from PIL import Image
-    im = Image.open("images/1.png")
-    im1 = np.asarray(im)
-
-    im = Image.open("images/2.png")
-    im2 = np.asarray(im)
-
-    im = Image.open("images/3.png")
-    im3 = np.asarray(im)
-
-    im = Image.open("images/4.png")
-    im4 = np.asarray(im)
-
-#append pixles
+    #append pixles
     imgArray = []
-    img1 = []
-    img2 = []
-    img3 = []
-    img4 = []
-    
-    
-    for i in range(len(im1)):
-        for j in range(len(im1[i])):
-            img1.append(im1[i][j][0]);
-
-    for i in range(len(im2)):
-        for j in range(len(im2[i])):
-            img2.append(im2[i][j][0]);
-
-    for i in range(len(im3)):
-        for j in range(len(im3[i])):
-            img3.append(im3[i][j][0]);
-
-    for i in range(len(im4)):
-        for j in range(len(im4[i])):
-            img4.append(im4[i][j][0]);
-
+    for s in range(1,4+1):
+        print(s)
+        im = Image.open("images/"+str(s)+".png")
+        im1 = np.asarray(im)
+        img1 = []
+        
+        for i in range(len(im1)):
+            for j in range(len(im1[i])):
+                img1.append(im1[i][j][0]);
+        imgArray.append(img1)
+    imgArray = array(imgArray)
     print("appended", imgArray)
-    imgArray = array([img1,img2,img3,img4]) #list of images for training
+
 
 
     
