@@ -132,7 +132,7 @@ if __name__ == "__main__":
     #append pixles for inputs
     for s in range(0,13+1): #0-13 results
         for t in range(0,1): #3 test images for every expected result
-            im = Image.open("images/images/Akkad/"+str(s)+"."+str(t)+".png")
+            im = Image.open("images/"+str(s)+"."+str(t)+".png")
             im1 = np.asarray(im)
             img1 = []
             
@@ -148,9 +148,12 @@ if __name__ == "__main__":
     random.seed(1)    
 
     #state connections between neurons
+
+    #note find a way for nodes to test and adjust after training to find the optimale number of neurons
+        #and connections.
     layerInput_1 = len(img1) #all images must be the same pixel size
-    layer1_2 = 20
-    layer2_3 = 7
+    layer1_2 = 45
+    layer2_3 = 14
     layer3_4 = 6
     layer4_out = 14
     
@@ -222,7 +225,7 @@ if __name__ == "__main__":
     while True:
         inputt = str(input())
         if " " != inputt != "" : #find image to check
-            check = "images/images/Akkad/"+inputt+".0"
+            check = "images/"+inputt+".0"
         im = Image.open(check+".png")
         imcheck = np.asarray(im) #convert img to array
         
