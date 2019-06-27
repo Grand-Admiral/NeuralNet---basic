@@ -10,10 +10,11 @@ class NeuronLayer():
         self.bias = 1
 
 class NeuralNetwork():
-    def __init__(self, layer1, layer2, layer3):
+    def __init__(self, layer1, layer2, layer3, layer4):
         self.layer1 = layer1
         self.layer2 = layer2
         self.layer3 = layer3
+        self.layer4 = layer4
 
     # The Sigmoid function, which describes an S shaped curve.
     # We pass the weighted sum of the inputs through this function to
@@ -26,15 +27,21 @@ class NeuralNetwork():
     # It indicates how confident we are about the existing weight.
     def __sigmoid_derivative(self, x):
         return x * (1 - x)
-
+    
     # We train the neural network through a process of trial and error.
     # Adjusting the synaptic weights each time.
     def train(self, training_set_inputs, training_set_outputs, number_of_training_iterations):
         for iteration in range(number_of_training_iterations):
             # Pass the training set through our neural network
-            output_from_layer_1, output_from_layer_2, output_from_layer_3 = self.think(training_set_inputs)
+            output_from_layer_1, output_from_layer_2, output_from_layer_3, output_from_layer_4 = self.think(training_set_inputs)
 
-            layer3_error = training_set_outputs - output_from_layer_3
+            layer4_error = training_set_outputs - output_from_layer_4
+            layer4_delta = layer4_error * self.__sigmoid_derivative(output_from_layer_4)
+
+            # Calculate the error for layer 3 (The difference between the desired output
+            # and the predicted output).
+            
+            layer3_error = layer4_delta.dot(self.layer4.synaptic_weights.T)
             layer3_delta = layer3_error * self.__sigmoid_derivative(output_from_layer_3)
             
             # Calculate the error for layer 2 (The difference between the desired output
@@ -54,16 +61,19 @@ class NeuralNetwork():
             layer1_adjustment = training_set_inputs.T.dot(layer1_delta)
             layer2_adjustment = output_from_layer_1.T.dot(layer2_delta)
             layer3_adjustment = output_from_layer_2.T.dot(layer3_delta)
+            layer4_adjustment = output_from_layer_3.T.dot(layer4_delta)
 
             # Adjust the weights.
             self.layer1.synaptic_weights += layer1_adjustment
             self.layer2.synaptic_weights += layer2_adjustment
             self.layer3.synaptic_weights += layer3_adjustment
+            self.layer4.synaptic_weights += layer4_adjustment
 
             ## Adjust the bias
             self.layer1.bias += 0.1 * np.sum(layer1_delta)
             self.layer2.bias += 0.1 * np.sum(layer2_delta)
             self.layer3.bias += 0.1 * np.sum(layer3_delta)
+            self.layer4.bias += 0.1 * np.sum(layer4_delta)
 
             if iteration == (round(number_of_training_iterations * 0.25)):
                 print("Progress: 25%")
@@ -79,8 +89,9 @@ class NeuralNetwork():
         output_from_layer1 = self.__sigmoid(dot(inputs, self.layer1.synaptic_weights)+self.layer1.bias)
         output_from_layer2 = self.__sigmoid(dot(output_from_layer1, self.layer2.synaptic_weights)+self.layer2.bias)
         output_from_layer3 = self.__sigmoid(dot(output_from_layer2, self.layer3.synaptic_weights)+self.layer2.bias)
-
-        return output_from_layer1, output_from_layer2, output_from_layer3
+        output_from_layer4 = self.__sigmoid(dot(output_from_layer3, self.layer4.synaptic_weights)+self.layer3.bias)
+        
+        return output_from_layer1, output_from_layer2, output_from_layer3,output_from_layer4
 
     # The neural network prints its weights
     def print_weights(self):
@@ -94,6 +105,10 @@ class NeuralNetwork():
         print("    Layer 3 (1 neuron, with 4 inputs):")
         print(self.layer3.synaptic_weights)
         print("L3 bias", self.layer3.bias)
+
+        print("    Layer 4 (1 neuron, with 4 inputs):")
+        print(self.layer4.synaptic_weights)
+        print("L4 bias", self.layer4.bias)
                 
 if __name__ == "__main__":
     #   o
@@ -134,9 +149,10 @@ if __name__ == "__main__":
 
     #state connections between neurons
     layerInput_1 = len(img1) #all images must be the same pixel size
-    layer1_2 = 10
-    layer2_3 = 5
-    layer3_out = 14
+    layer1_2 = 20
+    layer2_3 = 7
+    layer3_4 = 6
+    layer4_out = 14
     
     # Create layer 1 (120 neurons, each with 6 inputs)
     layer1 = NeuronLayer(layer1_2, layerInput_1) 
@@ -144,11 +160,14 @@ if __name__ == "__main__":
     # Create layer 2 (5 neurons with 120 inputs)
     layer2 = NeuronLayer(layer2_3, layer1_2)
 
-    # Create layer 2 (8 neurons with 5 inputs)
-    layer3 = NeuronLayer(layer3_out, layer2_3)
+    # Create layer 3 (8 neurons with 5 inputs)
+    layer3 = NeuronLayer(layer3_4, layer2_3)
 
+    # Create layer 3 (8 neurons with 5 inputs)
+    layer4 = NeuronLayer(layer4_out, layer3_4)
+    
     # Combine the layers to create a neural network
-    neural_network = NeuralNetwork(layer1, layer2, layer3)
+    neural_network = NeuralNetwork(layer1, layer2, layer3, layer4)
 
 
     print("Stage 1) Random starting synaptic weights: ")
@@ -203,7 +222,7 @@ if __name__ == "__main__":
     while True:
         inputt = str(input())
         if " " != inputt != "" : #find image to check
-            check = "images/images/Akkad/"+inputt
+            check = "images/images/Akkad/"+inputt+".0"
         im = Image.open(check+".png")
         imcheck = np.asarray(im) #convert img to array
         
@@ -212,13 +231,9 @@ if __name__ == "__main__":
             for j in range(len(imcheck[i])):
                 checkimg.append(imcheck[i][j][0]);
                 
-        # Test the neural network with a new situation.
-
-        #data for check
-        #data = array([inputdata, inputdata1, inputdata2, inputdata3, inputdata4, inputdata5])
-        
+        # Test the neural network with a new situation.     
         print("Stage 3) Considering a new situation", array(checkimg), "-> ?: ")
-        hidden_state1,hidden_state2, output = neural_network.think(array(checkimg))
+        hidden_state1,hidden_state2, hidden_state3, output = neural_network.think(array(checkimg))
         print("original: ", output)
         results = [round(output.tolist()[0]),round(output.tolist()[1]),
               round(output.tolist()[2]), round(output.tolist()[3]),
