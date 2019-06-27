@@ -10,9 +10,10 @@ class NeuronLayer():
         self.bias = 1
 
 class NeuralNetwork():
-    def __init__(self, layer1, layer2):
+    def __init__(self, layer1, layer2, layer3):
         self.layer1 = layer1
         self.layer2 = layer2
+        self.layer3 = layer3
 
     # The Sigmoid function, which describes an S shaped curve.
     # We pass the weighted sum of the inputs through this function to
@@ -31,12 +32,15 @@ class NeuralNetwork():
     def train(self, training_set_inputs, training_set_outputs, number_of_training_iterations):
         for iteration in range(number_of_training_iterations):
             # Pass the training set through our neural network
-            output_from_layer_1, output_from_layer_2 = self.think(training_set_inputs)
+            output_from_layer_1, output_from_layer_2, output_from_layer_3 = self.think(training_set_inputs)
 
+            layer3_error = training_set_outputs - output_from_layer_3
+            layer3_delta = layer3_error * self.__sigmoid_derivative(output_from_layer_3)
+            
             # Calculate the error for layer 2 (The difference between the desired output
             # and the predicted output).
             
-            layer2_error = training_set_outputs - output_from_layer_2
+            layer2_error = layer3_delta.dot(self.layer3.synaptic_weights.T)
             layer2_delta = layer2_error * self.__sigmoid_derivative(output_from_layer_2)
             
             #print(training_set_outputs, output_from_layer_2,layer2_error)
@@ -49,20 +53,34 @@ class NeuralNetwork():
             # Calculate how much to adjust the weights by
             layer1_adjustment = training_set_inputs.T.dot(layer1_delta)
             layer2_adjustment = output_from_layer_1.T.dot(layer2_delta)
+            layer3_adjustment = output_from_layer_2.T.dot(layer3_delta)
 
             # Adjust the weights.
             self.layer1.synaptic_weights += layer1_adjustment
             self.layer2.synaptic_weights += layer2_adjustment
+            self.layer3.synaptic_weights += layer3_adjustment
 
             ## Adjust the bias
             self.layer1.bias += 0.1 * np.sum(layer1_delta)
             self.layer2.bias += 0.1 * np.sum(layer2_delta)
+            self.layer3.bias += 0.1 * np.sum(layer3_delta)
+
+            if iteration == (round(number_of_training_iterations * 0.25)):
+                print("Progress: 25%")
+            if iteration == (round(number_of_training_iterations * 0.5)):
+                print("Progress: 50%")
+            if iteration == (round(number_of_training_iterations * 0.75)):
+                print("Progress: 75%")
+            if iteration == (round(number_of_training_iterations * 1)):
+                print("Progress: 100%")
 
     # The neural network thinks.
     def think(self, inputs):
         output_from_layer1 = self.__sigmoid(dot(inputs, self.layer1.synaptic_weights)+self.layer1.bias)
         output_from_layer2 = self.__sigmoid(dot(output_from_layer1, self.layer2.synaptic_weights)+self.layer2.bias)
-        return output_from_layer1, output_from_layer2
+        output_from_layer3 = self.__sigmoid(dot(output_from_layer2, self.layer3.synaptic_weights)+self.layer2.bias)
+
+        return output_from_layer1, output_from_layer2, output_from_layer3
 
     # The neural network prints its weights
     def print_weights(self):
@@ -73,13 +91,9 @@ class NeuralNetwork():
         print(self.layer2.synaptic_weights)
         print("L2 bias", self.layer2.bias)
 
-
-def imageOutResult(s,x,y):#test outputs for the akkad demo images
-    if s == x:
-        outNode1.append(y[0])
-        outNode2.append(y[1])
-        outNode3.append(y[2])
-        outNode4.append(y[3])
+        print("    Layer 3 (1 neuron, with 4 inputs):")
+        print(self.layer3.synaptic_weights)
+        print("L3 bias", self.layer3.bias)
                 
 if __name__ == "__main__":
     #   o
@@ -98,20 +112,6 @@ if __name__ == "__main__":
     
     
     imgArray = [] #final 
-    outNode1 = []
-    outNode2 = []
-    outNode3 = []
-    outNode4 = []
-    outNode5 = []
-    outNode6 = []
-    outNode7 = []
-    outNode8 = []
-    outNode9 = []
-    outNode10 = []
-    outNode11 = []
-    outNode12 = []
-    outNode13 = []
-    outNode14 = []
 
 
     #append pixles for inputs
@@ -126,25 +126,29 @@ if __name__ == "__main__":
                     img1.append(im1[i][j][0]);
             imgArray.append(img1) #append image to array of images
 
-            for checkx in range(4): #test expected outputs append
-                y = [0,0,0,0]
-                y[checkx] = 1 #change the zero that is to be the expected outcome
-                imageOutResult(s,checkx,y) #if s == checkx then append y to array
-
     
-    imgArray = array(imgArray)
+    
     
     #Seed the random number generator
     random.seed(1)    
 
-    # Create layer 1 (7 neurons, each with 6 inputs)
-    layer1 = NeuronLayer(20, len(img1)) #all images must be the same pixel size
+    #state connections between neurons
+    layerInput_1 = len(img1) #all images must be the same pixel size
+    layer1_2 = 10
+    layer2_3 = 5
+    layer3_out = 14
+    
+    # Create layer 1 (120 neurons, each with 6 inputs)
+    layer1 = NeuronLayer(layer1_2, layerInput_1) 
 
-    # Create layer 2 (4 single neuron with 7 inputs)
-    layer2 = NeuronLayer(8, 20)
+    # Create layer 2 (5 neurons with 120 inputs)
+    layer2 = NeuronLayer(layer2_3, layer1_2)
+
+    # Create layer 2 (8 neurons with 5 inputs)
+    layer3 = NeuronLayer(layer3_out, layer2_3)
 
     # Combine the layers to create a neural network
-    neural_network = NeuralNetwork(layer1, layer2)
+    neural_network = NeuralNetwork(layer1, layer2, layer3)
 
 
     print("Stage 1) Random starting synaptic weights: ")
@@ -153,37 +157,33 @@ if __name__ == "__main__":
     # The training set. We have 7 examples, each consisting of 3 input values
     # and 1 output value.
 
-    training_set_inputs = array([[1, 0, 1, 0, 1, 0],
-                                 [0, 1, 1, 0, 1, 1],
-                                 [0, 0, 1, 0, 0, 1],
-                                 [0, 1, 0, 0, 0, 1],
-                                 [1, 0, 0, 0, 0, 1],
-                                 [1, 1, 1, 1, 1, 1],
-                                 [0, 0, 0, 0, 0, 0],
-                                 [254, 254, 254, 254, 254, 254]])
+    imgArray = array(imgArray)
     
-    # each line down is a node      v  v  v  v  v  v  v
-    training_set_outputs2 = array([[1 ,0, 0, 0, 1, 0, 0, 1],
-                                   [0 ,1, 0, 0, 0, 1, 0, 1],
-                                   [0 ,0, 1, 0, 0, 0, 1, 1],
-                                   [0 ,0, 0, 1, 1, 1, 1, 1]]).T ####
 
     #image rec outputs
-    img_training_set_outputs = array([outNode1,
-                                      outNode2,
-                                      outNode3,
-                                      outNode4]).T
+    #note need more data to train each node more than once
+    #also need to find a way to not let a mess with training outputs appear. 
                                     #  0 1 2 3 4 5 6 7 8 9 10111213
-    img_training_set_outputs = array([[1,0,0,0,0,0,0,0,1,0,0,1,1,0],
-                                      [0,1,0,0,0,0,0,0,1,1,0,1,1,0],
-                                      [0,0,1,0,0,0,0,0,1,0,0,0,1,0],
-                                      [0,0,0,1,0,0,0,0,1,1,0,0,1,0],
+                                    #  v v v v v v v v v v v v v v
+    img_training_set_outputs = array([[1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                                      [0,1,0,0,0,0,0,0,0,0,0,0,0,0],
+                                      [0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+                                      [0,0,0,1,0,0,0,0,0,0,0,0,0,0],
                                       
-                                      [0,0,0,0,1,0,0,0,0,0,1,1,1,0],
-                                      [0,0,0,0,0,1,0,0,0,1,1,1,1,0],
-                                      [0,0,0,0,0,0,1,0,0,0,1,0,1,0],
-                                      [0,0,0,0,0,0,0,1,0,1,1,0,1,0],
+                                      [0,0,0,0,1,0,0,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,1,0,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,0,1,0,0,0,0,0,0,0],
+                                      [0,0,0,0,0,0,0,1,0,0,0,0,0,0],
+                                          
+                                      [0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0,1,0,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                                      [0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+                                          
+                                      [0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+                                      [0,0,0,0,0,0,0,0,0,0,0,0,0,1]
                                       ]).T
+    
     print("Test Inputs: ", len(img1))
     print(imgArray)
 
@@ -193,22 +193,22 @@ if __name__ == "__main__":
 
 
     # Train the neural network using the training set.
-    # Do it 60,000 times and make small adjustments each time.
+    # Do it 100,000 times and make small adjustments each time.
     neural_network.train(imgArray, img_training_set_outputs, 100000)
     
     print("Stage 2) New synaptic weights after training for single stage output: ")
     neural_network.print_weights()
 
-    check = "check"
+    check = "images/images/Akkad/1.0"
     while True:
         inputt = str(input())
-        if inputt != "":
+        if " " != inputt != "" : #find image to check
             check = "images/images/Akkad/"+inputt
         im = Image.open(check+".png")
-        imcheck = np.asarray(im)
+        imcheck = np.asarray(im) #convert img to array
         
         checkimg = []
-        for i in range(len(imcheck)):
+        for i in range(len(imcheck)):#reformat check image
             for j in range(len(imcheck[i])):
                 checkimg.append(imcheck[i][j][0]);
                 
@@ -218,11 +218,15 @@ if __name__ == "__main__":
         #data = array([inputdata, inputdata1, inputdata2, inputdata3, inputdata4, inputdata5])
         
         print("Stage 3) Considering a new situation", array(checkimg), "-> ?: ")
-        hidden_state, output = neural_network.think(array(checkimg))
+        hidden_state1,hidden_state2, output = neural_network.think(array(checkimg))
         print("original: ", output)
-        print("Rounded Result: ",[round(output.tolist()[0]),round(output.tolist()[1]),
+        results = [round(output.tolist()[0]),round(output.tolist()[1]),
               round(output.tolist()[2]), round(output.tolist()[3]),
               round(output.tolist()[4]),round(output.tolist()[5]),
-              round(output.tolist()[6]), round(output.tolist()[7])])
-
-        print("what it should be: ", img_training_set_outputs[int(float(inputt))])
+              round(output.tolist()[6]), round(output.tolist()[7]),
+              round(output.tolist()[8]), round(output.tolist()[9]),
+              round(output.tolist()[10]), round(output.tolist()[11]),
+              round(output.tolist()[12]), round(output.tolist()[13])]
+        print("Rounded Result: ",results)
+        if " " != inputt != "":
+            print("what it should be: ", img_training_set_outputs[int(float(inputt))])
