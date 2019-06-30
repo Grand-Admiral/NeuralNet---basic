@@ -2,11 +2,14 @@ from numpy import exp, array, random, dot
 from PIL import Image
 import numpy as np
 
+import torch
+print(torch.cuda.get_device_name(0),torch.cuda.is_available())
+
 #https://medium.com/technology-invention-and-more/how-to-build-a-multi-layered-neural-network-in-python-53ec3d1d326a
 
 class NeuronLayer():
     def __init__(self, number_of_neurons, number_of_inputs_per_neuron):
-        self.synaptic_weights = 2 * random.random((number_of_inputs_per_neuron, number_of_neurons)) - 1
+        self.synaptic_weights = 2 * random.random((number_of_inputs_per_neuron, number_of_neurons))-1
         self.bias = 1
 
 class NeuralNetwork():
@@ -58,10 +61,10 @@ class NeuralNetwork():
             layer1_delta = layer1_error * self.__sigmoid_derivative(output_from_layer_1)
 
             # Calculate how much to adjust the weights by
-            layer1_adjustment = training_set_inputs.T.dot(layer1_delta)
-            layer2_adjustment = output_from_layer_1.T.dot(layer2_delta)
-            layer3_adjustment = output_from_layer_2.T.dot(layer3_delta)
-            layer4_adjustment = output_from_layer_3.T.dot(layer4_delta)
+            layer1_adjustment = 0.1 * training_set_inputs.T.dot(layer1_delta)
+            layer2_adjustment = 0.1 * output_from_layer_1.T.dot(layer2_delta)
+            layer3_adjustment = 0.1 * output_from_layer_2.T.dot(layer3_delta)
+            layer4_adjustment = 0.1 * output_from_layer_3.T.dot(layer4_delta)
 
             # Adjust the weights.
             self.layer1.synaptic_weights += layer1_adjustment
@@ -75,6 +78,8 @@ class NeuralNetwork():
             self.layer3.bias += 0.1 * np.sum(layer3_delta)
             self.layer4.bias += 0.1 * np.sum(layer4_delta)
 
+            if iteration == (round(number_of_training_iterations * 0.01)):
+                print("Progress: 1%")
             if iteration == (round(number_of_training_iterations * 0.25)):
                 print("Progress: 25%")
             if iteration == (round(number_of_training_iterations * 0.5)):
@@ -83,6 +88,24 @@ class NeuralNetwork():
                 print("Progress: 75%")
             if iteration == (round(number_of_training_iterations * 1)):
                 print("Progress: 100%")
+
+
+
+            posaim =  0.00001
+            negaim = -0.00001
+            if np.sum(layer1_adjustment) < posaim and np.sum(layer1_adjustment) > negaim:
+                if np.sum(layer2_adjustment) < posaim and np.sum(layer2_adjustment) > negaim:
+                    if np.sum(layer3_adjustment) < posaim and np.sum(layer3_adjustment) > negaim:
+                        if np.sum(layer4_adjustment) < posaim and np.sum(layer4_adjustment) > negaim:
+                            print(True,iteration)
+                            print("error:", layer1_error,layer2_error,layer3_error,layer4_error)
+                            print("adjustments:", layer1_adjustment,layer2_adjustment,layer3_adjustment,layer4_adjustment)
+                            break
+        print("never made it")
+        print("error:", layer1_error,layer2_error,layer3_error,layer4_error)
+        print("adjustments:", layer1_adjustment,layer2_adjustment,layer3_adjustment,layer4_adjustment)
+
+
 
     # The neural network thinks.
     def think(self, inputs):
@@ -151,10 +174,10 @@ if __name__ == "__main__":
 
     #note find a way for nodes to test and adjust after training to find the optimale number of neurons
         #and connections.
-    layerInput_1 = len(img1) #all images must be the same pixel size
-    layer1_2 = 45
-    layer2_3 = 14
-    layer3_4 = 6
+    layerInput_1 = len(img1) #all images must be the same pixel size 45,14,6,14
+    layer1_2 = 200
+    layer2_3 = 100
+    layer3_4 = 50
     layer4_out = 14
     
     # Create layer 1 (120 neurons, each with 6 inputs)
@@ -216,7 +239,7 @@ if __name__ == "__main__":
 
     # Train the neural network using the training set.
     # Do it 100,000 times and make small adjustments each time.
-    neural_network.train(imgArray, img_training_set_outputs, 100000)
+    neural_network.train(imgArray, img_training_set_outputs, 60000)
     
     print("Stage 2) New synaptic weights after training for single stage output: ")
     neural_network.print_weights()
