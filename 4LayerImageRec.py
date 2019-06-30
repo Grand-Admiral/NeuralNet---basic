@@ -155,7 +155,7 @@ if __name__ == "__main__":
     #append pixles for inputs
     for s in range(0,13+1): #0-13 results
         for t in range(0,1): #3 test images for every expected result
-            im = Image.open("images/"+str(s)+"."+str(t)+".png")
+            im = Image.open("images/images/Akkad/"+str(s)+"."+str(t)+".png")
             im1 = np.asarray(im)
             img1 = []
             
@@ -248,7 +248,7 @@ if __name__ == "__main__":
     while True:
         inputt = str(input())
         if " " != inputt != "" : #find image to check
-            check = "images/"+inputt+".0"
+            check = "images/images/Akkad/"+inputt+".0"
         im = Image.open(check+".png")
         imcheck = np.asarray(im) #convert img to array
         
