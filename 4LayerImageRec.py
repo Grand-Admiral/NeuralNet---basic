@@ -78,8 +78,10 @@ class NeuralNetwork():
             self.layer3.bias += 0.1 * np.sum(layer3_delta)
             self.layer4.bias += 0.1 * np.sum(layer4_delta)
 
-            if iteration == (round(number_of_training_iterations * 0.01)):
-                print("Progress: 1%")
+            if iteration == (round(number_of_training_iterations * 0.05)):
+                print("Progress: 5%")
+            if iteration == (round(number_of_training_iterations * 0.15)):
+                print("Progress: 15%")
             if iteration == (round(number_of_training_iterations * 0.25)):
                 print("Progress: 25%")
             if iteration == (round(number_of_training_iterations * 0.5)):
@@ -149,13 +151,14 @@ if __name__ == "__main__":
     #   o
     
     
-    imgArray = [] #final 
+    imgArray = [] #final
+    url = "images/"#images/Akkad/"
 
 
     #append pixles for inputs
     for s in range(0,13+1): #0-13 results
         for t in range(0,1): #3 test images for every expected result
-            im = Image.open("images/images/Akkad/"+str(s)+"."+str(t)+".png")
+            im = Image.open(url+str(s)+"."+str(t)+".png")
             im1 = np.asarray(im)
             img1 = []
             
@@ -170,26 +173,31 @@ if __name__ == "__main__":
     #Seed the random number generator
     random.seed(1)    
 
+    transform = int(input("determin size of network chose one(1,2,4,8,16,32,64): "))
     #state connections between neurons
+    #You must follow the triangle structure (e.g. input,200,100,50,output) for the best results
+    layerInput_1 = len(img1) #all images must be the same pixel size 
+    layer1_2 = round(layerInput_1 / (transform)) #2
 
-    #note find a way for nodes to test and adjust after training to find the optimale number of neurons
-        #and connections.
-    layerInput_1 = len(img1) #all images must be the same pixel size 45,14,6,14
-    layer1_2 = 200
-    layer2_3 = 100
-    layer3_4 = 50
+    transform = transform*2
+
+    layer2_3 = round(layerInput_1 / (transform)) #4
+
+    transform = transform*2
+    
+    layer3_4 = round(layerInput_1 / (transform)) #8
     layer4_out = 14
     
-    # Create layer 1 (120 neurons, each with 6 inputs)
+    # Create layer 1 (200 neurons, each with 400 inputs)
     layer1 = NeuronLayer(layer1_2, layerInput_1) 
 
-    # Create layer 2 (5 neurons with 120 inputs)
+    # Create layer 2 (100 neurons with 200 inputs)
     layer2 = NeuronLayer(layer2_3, layer1_2)
 
-    # Create layer 3 (8 neurons with 5 inputs)
+    # Create layer 3 (50 neurons with 100 inputs)
     layer3 = NeuronLayer(layer3_4, layer2_3)
 
-    # Create layer 3 (8 neurons with 5 inputs)
+    # Create layer 3 (14 neurons with 50 inputs)
     layer4 = NeuronLayer(layer4_out, layer3_4)
     
     # Combine the layers to create a neural network
@@ -199,15 +207,13 @@ if __name__ == "__main__":
     print("Stage 1) Random starting synaptic weights: ")
     neural_network.print_weights()
 
-    # The training set. We have 7 examples, each consisting of 3 input values
-    # and 1 output value.
-
-    imgArray = array(imgArray)
+    # The training set. We have 14 examples, each consisting of 400 input values
+    # and 14 output values.
+    
+    imgArray = array(imgArray) # The 14 images as training inputs
     
 
-    #image rec outputs
-    #note need more data to train each node more than once
-    #also need to find a way to not let a mess with training outputs appear. 
+    #training outputs
                                     #  0 1 2 3 4 5 6 7 8 9 10111213
                                     #  v v v v v v v v v v v v v v
     img_training_set_outputs = array([[1,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -228,7 +234,7 @@ if __name__ == "__main__":
                                       [0,0,0,0,0,0,0,0,0,0,0,0,1,0],
                                       [0,0,0,0,0,0,0,0,0,0,0,0,0,1]
                                       ]).T
-    
+    #Check the data for training
     print("Test Inputs: ", len(img1))
     print(imgArray)
 
@@ -238,17 +244,18 @@ if __name__ == "__main__":
 
 
     # Train the neural network using the training set.
-    # Do it 100,000 times and make small adjustments each time.
+    # Do it 60,000 times and make small adjustments each time. If the adjustments get really small exit and print how many rounds it went.
     neural_network.train(imgArray, img_training_set_outputs, 60000)
     
     print("Stage 2) New synaptic weights after training for single stage output: ")
     neural_network.print_weights()
 
-    check = "images/images/Akkad/1.0"
+### Use network ###
+    check = url+"1.0"
     while True:
         inputt = str(input())
         if " " != inputt != "" : #find image to check
-            check = "images/images/Akkad/"+inputt+".0"
+            check = url+inputt+".0"
         im = Image.open(check+".png")
         imcheck = np.asarray(im) #convert img to array
         
